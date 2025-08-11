@@ -5,7 +5,10 @@
 #  TVerDown の TARGET を標準出力に出力する。
 #
 
+require 'optparse'
 require 'json'
+
+require_relative 'lib/Const.rb'
 
 class MakeTarget
   
@@ -56,22 +59,46 @@ class MakeTarget
   def initialize( )
 
     @list = {}
-    json = File.join( ENV["HOME"], ".config/google-chrome/Default/Bookmarks" )
-    json = File.join( ENV["HOME"], ".config/vivaldi/Default/Bookmarks" )
+    @json = File.join( ENV["HOME"], ".config/google-chrome/Default/Bookmarks" )
+    #@json = File.join( ENV["HOME"], ".config/vivaldi/Default/Bookmarks" )
 
-    File.open(json) do |file|
-      hash = JSON.load(file)
-
-      root = hash["roots"]
-      if root.class == Hash
-        hashDump( root )
-      elsif root.class == Array
-        arrayDump( root )
-      end
+    OptionParser.new do |opt|
+      @pname = opt.program_name
+      opt.version = ProgVer
+      opt.on('--json json','-J json') {|v| @json = v } 
+      opt.on('--help' )                   { usage() } 
+      opt.parse!(ARGV)
     end
 
-    output()    
+    if test( ?f, @json )
+      File.open(@json) do |file|
+        hash = JSON.load(file)
+
+        root = hash["roots"]
+        if root.class == Hash
+          hashDump( root )
+        elsif root.class == Array
+          arrayDump( root )
+        end
+      end
+      output()    
+    else
+      puts("Error: json file not found (#{@json})")
+    end
+
   end
+
+  def usage()
+    puts <<EOS
+使用法: #{@pname} [オプション]... 
+
+ -j, --json=file   読み込む json ファイルを指定する。指定しない場合は、
+                   #{@json}
+
+EOS
+    exit
+  end
+  
 
 end
 

@@ -10,6 +10,7 @@ require 'open-uri'
 require 'find'
 require 'ferrum.rb'
 
+
 require_relative 'lib/Const.rb'
 require_relative 'lib/Sqlite.rb'
 require_relative 'lib/MyFerrum.rb'
@@ -17,6 +18,7 @@ require_relative 'lib/common.rb'
 require_relative 'lib/Opt.rb'
 require_relative 'lib/readConf.rb'
 require_relative "lib/noko.rb"
+
 
 class Main
 
@@ -185,10 +187,13 @@ class Main
     raise "config not found" if Object.const_defined?(:BaseDir) != true
     raise "target not found" if Object.const_defined?(:TARGET) != true
 
+    $opt.hl = HEADLESS if $opt.hl == nil
+    
     [ BaseDir, CacheDir, DbDir ].each do |dir|
       FileUtils.mkdir_p( dir ) unless test( ?d, dir )
     end
 
+                
     log("TVerDown start")
     expire()
     run()

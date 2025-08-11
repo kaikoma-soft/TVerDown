@@ -41,15 +41,15 @@
 * 必要なツールをパッケージからインストールする。(ubuntu の場合)
 
   ```
-  $ sudo apt install -y ruby ruby-dev ruby-sqlite3 ruby-nokogiri chromium-browser sqlite3 wget python3
+  $ sudo apt install -y ruby ruby-dev ruby-sqlite3 ruby-nokogiri chromium-browser sqlite3 wget python3 git make gcc
   $ sudo gem install ferrum
   ```
 * yt-dlp のインストール
   yt-dlp は頻繁にアップデートされるのでパッケージではなく、
   配布元から直接インストールする。
   ```
-  $ mkdir -p $HOME/TVerDown/prog
-  $ cd $HOME/TVerDown/prog
+  $ mkdir -p $HOME/TVerDown/com
+  $ cd $HOME/TVerDown/com
   $ wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
   $ chmod +x yt-dlp
   $ ./yt-dlp --update
