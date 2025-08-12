@@ -29,6 +29,7 @@ class Opt
  -C, --configDir=dir   config.rb,target.rb のあるDir を指定する。
  -M, --maxproc=n       変換数の制限
  -F, --force           ロックを無視して実行する。
+     --help            help メッセージ
 
 EOS
     exit

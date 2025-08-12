@@ -36,26 +36,48 @@ class Main
     #
     #  番組情報の取得
     #
-    plist = []
     regex = nil
     if $opt.regex != nil
       regex = Regexp.new( $opt.regex )
     end
 
     ferrum = 0
-    TARGET.each_pair do | url, dir|
-      ignore = false
-      progdl = false
-      if regex != nil and !( regex =~ dir )
-        ignore = true
+    target2 = {}
+    TARGET.each do |tmp|
+      url, dir, opt  = tmp
+
+      if opt != nil 
+        if opt.start_with?(/d/i) == true    # Date
+          opt = :date
+        elsif opt.start_with?(/s/i) == true # Serial
+          opt = :serial
+        else
+          log("Warn: TARGET の オプションが不正です。#{dir}(#{url}) #{opt}" )
+        end
+      end
+      if target2[ url ] == nil
+        target2[ url ] = Pdata.new( url, dir, opt )
       else
-        if mf.get?( url ) == true
-          progdl = true
+        log("Warn: TARGET の URL が重複しています。#{dir}(#{url})" )
+      end
+    end
+
+    plist = []
+    target2.each_pair do |k,v|
+      v.url = File.join( TVERJP, v.url ) unless v.url =~ /~http/
+      v.ignore = false
+      v.progdl = false
+      if regex != nil and !( regex =~ v.dir )
+        v.ignore = true
+      else
+        if mf.get?( v.url ) == true
+          v.progdl = true
           ferrum += 1
         end
       end
-      cf = mf.cacheFname( url )
-      plist << Pdata.new( url, dir, cf, nil, 0, ignore, progdl )
+      v.cf = mf.cacheFname( v.url )
+      v.dcount = 0
+      plist << v
     end
 
     if ferrum > 0
@@ -136,20 +158,20 @@ class Main
     #
     catch(:exit_point) do
       plist.each do |p|
-        p.list.each do |tmp|
-          if tmp.downFlag == true
-            url2 = File.join( TVERJP, tmp.url )
+        p.list.each do |p2|
+          if p2.downFlag == true
+            url2 = File.join( TVERJP, p2.url )
             outDir = File.join( SpoolDir, p.dir ) 
             FileUtils.mkdir_p( outDir ) unless test( ?d, outDir )
             
             db.open() do |db2|
               if db2.exist?( url2 ) == false
-                db2.insert( url2, tmp.title, Time.now.to_i )
+                db2.insert( url2, p2.title, Time.now.to_i )
               end
             end
-            log("Download 開始 #{dcount}/#{dltcount} #{tmp.title}")
+            log("Download 開始 #{dcount}/#{dltcount} #{p2.title}")
             st = Time.now
-            if ytDlp( url2, outDir ) ==  true
+            if ytDlp( url2, outDir, p.opt ) ==  true
               lap = ( Time.now - st ).to_i
               log("Download 成功 #{lap} 秒")
               db.open() do |db2|
@@ -202,7 +224,7 @@ class Main
   end
 
 
-  def ytDlp( url, outDir )
+  def ytDlp( url, outDir, opt = nil )
 
     return true if $opt.done == true
     tmpdir = Dir.mktmpdir( "TVer_" )
@@ -230,8 +252,7 @@ class Main
       else
         fname.strip!
       end
-      fname = fnameChk( fname )
-      
+      fname = makeFname( fname, outDir, opt )
       cmd = [ YTDLP_cmd ] + YTDLP_opt
       cmd += [ "-P", tmpdir, "-o", fname, url ]
 
@@ -251,17 +272,62 @@ class Main
       FileUtils.remove_entry_secure tmpdir
     end
 
+    if ret == true and opt == :serial
+      inc_serial( outDir )
+    end
+    
     return ret
+  end
+
+  #
+  #   シリアル番号の取得
+  #
+  def get_serial( dir )
+    ret = 1
+    fn = File.join( dir, ".serial.txt")
+    if test( ?f, fn )
+      File.open( fn, "r") do |fp|
+        num = fp.gets
+        if num != nil
+          ret = num.to_i
+        end
+      end
+    end
+    return ret
+  end
+
+  #
+  #   シリアル番号の +1
+  #
+  def inc_serial( dir )
+
+    n = get_serial( dir ) + 1
+    fn = File.join( dir, ".serial.txt")
+    File.open( fn, "w") do |fp|
+      fp.puts( n.to_s )
+    end
+    return n
   end
   
   #
   #  ファイル名の文字列の加工
   #
-  def fnameChk( str )
+  def makeFname( str, outDir, opt = nil )
     tmp = str.gsub(/\//,'／').dup
     tmp.strip!
     base = File.basename( tmp, ".*")
     ext = File.extname( tmp )
+
+    if opt != nil 
+      if opt == :date
+        day = Time.now.strftime("%Y-%m-%d ")
+        base = day + base
+      elsif opt == :serial
+        n = get_serial( outDir )
+        base = sprintf("#%02d ", n ) + base
+      end
+    end
+    
     base2 = truncate_utf8_by_bytes( base, MAX_FNLEN )
     ret = base2 + ext 
     return ret

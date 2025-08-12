@@ -47,13 +47,15 @@ class MakeTarget
   end
 
   def output()
-    puts("TARGET = {")
+    tver = Regexp.escape( TVERJP )
+    puts("TARGET = [")
     @list.keys.sort.each do |key|
-      tmp = "\"" + key + "\""
-      tmp2 = @list[key].dup.gsub(/\//,'／')
-      printf("    %-36s => \"%s\",\n", tmp, tmp2 )
+      tmp = key.sub(/#{tver}\//o,'')
+      tmp = "\"" + tmp + "\""
+      tmp2 = "\"" + @list[key].dup.gsub(/\//,'／') + "\""
+      printf("    [ %-22s, %s, nil ],\n", tmp, tmp2 )
     end
-    puts("}")
+    puts("]")
   end
   
   def initialize( )
@@ -94,6 +96,7 @@ class MakeTarget
 
  -j, --json=file   読み込む json ファイルを指定する。指定しない場合は、
                    #{@json}
+     --help        help メッセージ
 
 EOS
     exit

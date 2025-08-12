@@ -23,6 +23,7 @@ LogFn   = File.join( "/tmp", "TVerDown.log" )
 #
 Pdata    = Struct.new( :url,    # 番組ページURL
                        :dir,    # 保存Dir名
+                       :opt,    # ファイル名の加工オプション
                        :cf,     # キャッシュファイル名
                        :list,   # 個別番組への配列 -> PdataSub
                        :dcount, # download 数
@@ -30,3 +31,4 @@ Pdata    = Struct.new( :url,    # 番組ページURL
                        :progdl  # 番組ページを DL するか
                      ) 
 PdataSub = Struct.new( :url, :title, :downFlag, :failcount ) # 番組個別
+

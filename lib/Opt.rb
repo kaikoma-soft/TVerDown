@@ -46,13 +46,13 @@ class Opt
      --done            download せずに、download終了とする。
  -D, --dryrun          download せずに、状況表示のみで終了する。
  -F, --force           累積エラーでも無視して download する。
- -H, --no-headless     chrome をヘッドレスで起動しない
- -N, --no-cache        キャッシュを使用しない
- -R, --regex=str       正規表現で、download対象を絞る
+ -H, --no-headless     chrome をヘッドレスで起動しない。
+ -N, --no-cache        キャッシュを使用しない。
+ -R, --regex=str       正規表現で、download対象を絞る。
  -v, --verbose         冗長表示
      --version         Version 表示
  -d, --debug           デバッグ モード
- -h, --headless        chrome をヘッドレスで起動する
+ -h, --headless        chrome をヘッドレスで起動する。
      --help            help メッセージ
  -n, --maxnum=n        download 個数制限
 
