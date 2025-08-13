@@ -11,8 +11,6 @@ class MyFerrum
 
   def initialize( headless = true )
 
-    @saveDir = BaseDir
-    @downdir = BaseDir
     @cookiesFn = File.join( DbDir, "ferrumCookies.yaml" )
     @browser   = nil
     @headless = headless

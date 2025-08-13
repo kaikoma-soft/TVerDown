@@ -139,13 +139,14 @@ class Main
       next if p.ignore == true
       log( "# " + p.dir ) if p.dcount > 0 or $opt.v == true
       p.list.each do |tmp|
+        title = renameRule( tmp.title )
         if tmp.failcount == EOD
-          log( sprintf(" - %s %s", tmp.url, tmp.title ) ) if $opt.v == true
+          log( sprintf(" - %s %s", tmp.url, title ) ) if $opt.v == true
         elsif tmp.downFlag == true
-          log( sprintf(" + %s %s", tmp.url, tmp.title ) )
+          log( sprintf(" + %s %s", tmp.url, title ) )
           dltcount += 1
         elsif tmp.failcount >= FailCount
-          log( sprintf(" E %s %s", tmp.url, tmp.title ) )
+          log( sprintf(" E %s %s", tmp.url, title ) )
         end
       end
     end
@@ -206,15 +207,20 @@ class Main
     #  config,target の読み込み
     #
     readConf( $opt.config )
-    raise "config not found" if Object.const_defined?(:BaseDir) != true
+    raise "config not found" if Object.const_defined?(:CacheDir) != true
     raise "target not found" if Object.const_defined?(:TARGET) != true
 
     $opt.hl = HEADLESS if $opt.hl == nil
     
-    [ BaseDir, CacheDir, DbDir ].each do |dir|
+    [ CacheDir, DbDir ].each do |dir|
       FileUtils.mkdir_p( dir ) unless test( ?d, dir )
     end
 
+    # yt-dlp の存在確認
+    unless FileTest.executable?( YTDLP_cmd )
+      log("Error: yt-dlp not executable (#{YTDLP_cmd})")
+      exit
+    end
                 
     log("TVerDown start")
     expire()
@@ -317,6 +323,8 @@ class Main
     tmp.strip!
     base = File.basename( tmp, ".*")
     ext = File.extname( tmp )
+
+    base = renameRule( base )
 
     if opt != nil 
       if opt == :date

@@ -18,7 +18,7 @@ require_relative 'lib/readConf.rb'
 $opt = Opt.new
 
 readConf( $opt.config )
-raise "config not found" if Object.const_defined?(:BaseDir) != true
+raise "config not found" if Object.const_defined?(:SpoolDir) != true
 
 
 #
