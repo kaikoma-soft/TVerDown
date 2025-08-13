@@ -22,12 +22,7 @@ then
    export TVERDOWN_CONF_DIR="${instdir}/config"
 fi
 
-if cd $instdir
-then
-    ruby ./x265conv.rb -M 1 $*
-else
-    echo "dir not found"
-fi
+ruby ${instdir}/x265conv.rb -M 1 $*
 
 
 

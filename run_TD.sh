@@ -12,11 +12,7 @@ then
    export TVERDOWN_CONF_DIR="${instdir}/config"
 fi
 
-if cd $instdir
-then
-    ruby ./TVerDown.rb $*
-else
-    echo "dir not found"
-fi
+ruby ${instdir}/TVerDown.rb $*
+
 
 
