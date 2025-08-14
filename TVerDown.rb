@@ -51,6 +51,8 @@ class Main
           opt = :date
         elsif opt.start_with?(/s/i) == true # Serial
           opt = :serial
+        elsif opt.start_with?(/n/i) == true # nil
+          opt = nil
         else
           log("Warn: TARGET の オプションが不正です。#{dir}(#{url}) #{opt}" )
         end

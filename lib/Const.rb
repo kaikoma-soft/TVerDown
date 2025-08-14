@@ -14,11 +14,6 @@ ProgVer  = "Ver 0.0.0"
 
 
 #
-#  Log ファイル
-#
-LogFn   = File.join( "/tmp", "TVerDown.log" )
-
-#
 #  構造体定義
 #
 Pdata    = Struct.new( :url,    # 番組ページURL

@@ -28,6 +28,12 @@ YTDLP_opt = %W( -r 1M --progress --color no_color )
 HEADLESS = false
 
 #
+#  Log ファイル
+#
+LogFn   = File.join( "/tmp", "TVerDown.log" )
+
+
+#
 #  for x256 conv
 #
 ConvInDir  = SpoolDir
