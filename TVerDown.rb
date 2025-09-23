@@ -214,7 +214,7 @@ class Main
 
     $opt.hl = HEADLESS if $opt.hl == nil
     
-    [ CacheDir, DbDir ].each do |dir|
+    [ CacheDir, DbDir, SpoolDir ].each do |dir|
       FileUtils.mkdir_p( dir ) unless test( ?d, dir )
     end
 

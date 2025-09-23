@@ -106,7 +106,7 @@ end
 #
 
 def expireOrgMp4( fname )
-  limit = Time.now - ( 3600 * 24 * X264expire )
+  limit = Time.now - ( 3600 * 24 * X264expire  ) # 
   if test( ?f, fname )
     size = File.size( fname )
     if size > 0
