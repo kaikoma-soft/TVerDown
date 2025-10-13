@@ -204,6 +204,7 @@ class Main
   def initialize( )
 
     $opt = Opt.new
+    $opt.parser()
 
     #
     #  config,target の読み込み

@@ -18,6 +18,9 @@ class Opt
     @regex  = nil               # 対象を絞る正規表現
     @force  = false             # エラーカウントを無視してdownload
 
+  end
+
+  def parser()
     OptionParser.new do |opt|
       @pname = opt.program_name
       opt.version = ProgVer

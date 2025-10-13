@@ -9,6 +9,8 @@ require 'optparse'
 require 'json'
 
 require_relative 'lib/Const.rb'
+require_relative 'lib/Opt.rb'
+require_relative 'lib/readConf.rb'
 
 class MakeTarget
   
@@ -53,9 +55,28 @@ class MakeTarget
       tmp = key.sub(/#{tver}\//o,'')
       tmp = "\"" + tmp + "\""
       tmp2 = "\"" + @list[key].dup.gsub(/\//,'／') + "\""
-      printf("    [ %-22s, %s, nil ],\n", tmp, tmp2 )
+      printf("  [ %-22s, %s, nil ],\n", tmp, tmp2 )
     end
     puts("]")
+  end
+
+  def output_diff()             # 差分を出力
+
+    urls = {}
+    TARGET.each do |tmp|
+      urls[ tmp[0] ] = true
+    end
+    
+    tver = Regexp.escape( TVERJP )
+    @list.keys.sort.each do |key|
+      tmp = key.sub(/#{tver}\//o,'')
+      if urls[ tmp ] == nil
+        tmp = "\"" + tmp + "\""
+        tmp2 = "\"" + @list[key].dup.gsub(/\//,'／') + "\""
+        printf("  [ %-22s, %s, nil ],\n", tmp, tmp2 )
+      end
+    end
+
   end
   
   def initialize( )
@@ -63,15 +84,25 @@ class MakeTarget
     @list = {}
     @json = File.join( ENV["HOME"], ".config/google-chrome/Default/Bookmarks" )
     #@json = File.join( ENV["HOME"], ".config/vivaldi/Default/Bookmarks" )
-
+    @merge = false
+    @config = nil               # config ファイル
+    
     OptionParser.new do |opt|
       @pname = opt.program_name
       opt.version = ProgVer
       opt.on('--json json','-J json') {|v| @json = v } 
-      opt.on('--help' )                   { usage() } 
+      opt.on('--merge','-M')          { @merge = ! @merge } 
+      opt.on('--configDir dir','-C dir' ) {|v| @config = v } 
+      opt.on('--help' )               { usage() } 
       opt.parse!(ARGV)
     end
 
+    if  @merge == true
+      $opt = Opt.new
+      readConf( @config )
+      raise "target not found" if Object.const_defined?(:TARGET) != true
+    end
+    
     if test( ?f, @json )
       File.open(@json) do |file|
         hash = JSON.load(file)
@@ -83,7 +114,12 @@ class MakeTarget
           arrayDump( root )
         end
       end
-      output()    
+      if @merge == false
+        output()
+      else
+        output_diff()
+      end
+        
     else
       puts("Error: json file not found (#{@json})")
     end
@@ -94,9 +130,11 @@ class MakeTarget
     puts <<EOS
 使用法: #{@pname} [オプション]... 
 
- -j, --json=file   読み込む json ファイルを指定する。指定しない場合は、
-                   #{@json}
-     --help        help メッセージ
+ -J, --json=file       読み込む json ファイルを指定する。指定しない場合は、
+                       #{@json}
+ -M, --merge           target.rb の内容と比較して、追加分だけを出力する。
+ -C, --configDir=dir   target.rb のあるDir を指定する。(-M 指定時のみ有効)
+     --help            help メッセージ
 
 EOS
     exit

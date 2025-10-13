@@ -10,7 +10,7 @@ EOD       = 9999                # End of Download
 IDLETIME  = 30                  # アイドルタイム
 MAX_FNLEN = 230                 # ファイル名の最大長
 
-ProgVer  = "Ver 1.0.0"
+ProgVer  = "Ver 1.1.0"
 
 
 #
