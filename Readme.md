@@ -154,6 +154,7 @@ mpv等で再生するという手作業を行っていた。
                         ~/.config/google-chrome/Default/Bookmarks
     -M, --merge          target.rb の内容と比較して、追加分だけを出力する。
     -C, --configDir=dir  target.rb のあるDir を指定する。(-M 指定時のみ有効)
+    -O, --opt=type       オプションの文字列(nil,Date,Serial) を指定。デフォルトは Date 
         --help           help メッセージ
    ```
    なお target.rb の検索順序は TVerDown と同じ。
@@ -211,6 +212,7 @@ mpv等で再生するという手作業を行っていた。
   | -J, --json=file    |  読み込む json ファイルを指定する。         |
   | -M, --merge        |  target.rb の内容と比較して、追加分だけを出力する。|
   | -C, --configDir=dir|  target.rb のあるDir を指定する。(-M 指定時のみ有効)|
+  | -O, --opt=type     |  オプションの文字列(nil,Date,Serial) を指定。デフォルトは Date |
   |     --help         |  help メッセージ                            |
 
 

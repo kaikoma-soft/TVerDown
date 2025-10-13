@@ -1,12 +1,14 @@
 
 ver 1.1.0         2025/10/13
-  ・ makeTarget.rb -M の時に、除外するものを記述出来るように
+  * makeTarget.rb -M の時に、除外するものを記述出来るように
      target.rb に DELLIST を追加
-
+  * makeTarget.rb に -O オプションを追加
+     それに伴いデフォルトのオプション文字列を Date に変更。
+     
 ver 1.1.0         2025/10/11
-  ・ makeTarget.rb に -M オプションを追加。
+  * makeTarget.rb に -M オプションを追加。
      -M は、target.rb の内容と比較して、追加分だけを出力するオプション。
 
 ver 1.0.0         2025/09/23
-  ・初版
+  * 初版
 

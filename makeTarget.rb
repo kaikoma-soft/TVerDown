@@ -61,7 +61,7 @@ EOS
       tmp = key.sub(/#{tver}\//o,'')
       tmp = "\"" + tmp + "\""
       tmp2 = "\"" + @list[key].dup.gsub(/\//,'／') + "\""
-      printf("  [ %-22s, %s, nil ],\n", tmp, tmp2 )
+      printf("  [ %-22s, %s, %s ],\n", tmp, tmp2, @optStr )
     end
     puts("]")
     str = <<EOS
@@ -98,7 +98,7 @@ EOS
       if urls[ tmp ] == nil
         tmp = "\"" + tmp + "\""
         tmp2 = "\"" + @list[key].dup.gsub(/\//,'／') + "\""
-        printf("  [ %-22s, %s, nil ],\n", tmp, tmp2 )
+        printf("  [ %-22s, %s, %s ],\n", tmp, tmp2, @optStr )
       end
     end
 
@@ -111,6 +111,7 @@ EOS
     #@json = File.join( ENV["HOME"], ".config/vivaldi/Default/Bookmarks" )
     @merge = false
     @config = nil               # config ファイル
+    @optStr = '"' + OptStr + '"'
     
     OptionParser.new do |opt|
       @pname = opt.program_name
@@ -118,6 +119,7 @@ EOS
       opt.on('--json json','-J json')     {|v| @json = v } 
       opt.on('--merge','-M')              { @merge = ! @merge } 
       opt.on('--configDir dir','-C dir' ) {|v| @config = v } 
+      opt.on('--opt type','-O type' )     {|v| @optStr = '"' + v + '"'} 
       opt.on('--help' )                   { usage() } 
       opt.parse!(ARGV)
     end
@@ -159,6 +161,7 @@ EOS
                        #{@json}
  -M, --merge           target.rb の内容と比較して、追加分だけを出力する。
  -C, --configDir=dir   target.rb のあるDir を指定する。(-M 指定時のみ有効)
+ -O, --opt=type        オプションの文字列(nil,Date,Serial) を指定。デフォルトは Date 
      --help            help メッセージ
 
 EOS

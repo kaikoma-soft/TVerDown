@@ -9,6 +9,7 @@ FailCount = 3                   # download 失敗の制限値
 EOD       = 9999                # End of Download
 IDLETIME  = 30                  # アイドルタイム
 MAX_FNLEN = 230                 # ファイル名の最大長
+OptStr    = "Date"              # makeTarget.rb のオプションの文字列
 
 ProgVer  = "Ver 1.1.1"
 
