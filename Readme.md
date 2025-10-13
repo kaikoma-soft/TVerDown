@@ -150,7 +150,7 @@ mpv等で再生するという手作業を行っていた。
    ```
    使用法: makeTarget [オプション]... 
 
-    -j, --json=file      読み込む json ファイルを指定する。指定しない場合は、
+    -J, --json=file      読み込む json ファイルを指定する。指定しない場合は、
                         ~/.config/google-chrome/Default/Bookmarks
     -M, --merge          target.rb の内容と比較して、追加分だけを出力する。
     -C, --configDir=dir  target.rb のあるDir を指定する。(-M 指定時のみ有効)
@@ -208,7 +208,9 @@ mpv等で再生するという手作業を行っていた。
 * makeTarget.rb
   |   オプション       |      説明                                   |
   |--------------------|---------------------------------------------|
-  | -j, --json=file    |  読み込む json ファイルを指定する。         |
+  | -J, --json=file    |  読み込む json ファイルを指定する。         |
+  | -M, --merge        |  target.rb の内容と比較して、追加分だけを出力する。|
+  | -C, --configDir=dir|  target.rb のあるDir を指定する。(-M 指定時のみ有効)|
   |     --help         |  help メッセージ                            |
 
 

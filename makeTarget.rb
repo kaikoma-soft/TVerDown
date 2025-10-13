@@ -50,6 +50,12 @@ class MakeTarget
 
   def output()
     tver = Regexp.escape( TVERJP )
+    str = <<EOS
+#
+#  Download 対象の番組ページの URL と 保存SubDir と オプション
+#
+EOS
+    puts( str )
     puts("TARGET = [")
     @list.keys.sort.each do |key|
       tmp = key.sub(/#{tver}\//o,'')
@@ -58,18 +64,37 @@ class MakeTarget
       printf("  [ %-22s, %s, nil ],\n", tmp, tmp2 )
     end
     puts("]")
+    str = <<EOS
+
+#
+#  -M オプションの対象外にするもの(書式は TARGET と同じ)
+#
+DELLIST = [
+]
+EOS
+    puts( str )
   end
 
   def output_diff()             # 差分を出力
 
     urls = {}
-    TARGET.each do |tmp|
-      urls[ tmp[0] ] = true
+    if Object.const_defined?(:TARGET) == true # 対象リスト
+      TARGET.each do |tmp|
+        urls[ tmp[0] ] = true
+      end
+    end
+    
+    delList = {}
+    if Object.const_defined?(:DELLIST) == true # 対象外リスト
+      DELLIST.each do |tmp|
+        delList[ tmp[0] ] = true
+      end
     end
     
     tver = Regexp.escape( TVERJP )
     @list.keys.sort.each do |key|
       tmp = key.sub(/#{tver}\//o,'')
+      next if delList[ tmp ] == true
       if urls[ tmp ] == nil
         tmp = "\"" + tmp + "\""
         tmp2 = "\"" + @list[key].dup.gsub(/\//,'／') + "\""
@@ -90,10 +115,10 @@ class MakeTarget
     OptionParser.new do |opt|
       @pname = opt.program_name
       opt.version = ProgVer
-      opt.on('--json json','-J json') {|v| @json = v } 
-      opt.on('--merge','-M')          { @merge = ! @merge } 
+      opt.on('--json json','-J json')     {|v| @json = v } 
+      opt.on('--merge','-M')              { @merge = ! @merge } 
       opt.on('--configDir dir','-C dir' ) {|v| @config = v } 
-      opt.on('--help' )               { usage() } 
+      opt.on('--help' )                   { usage() } 
       opt.parse!(ARGV)
     end
 
