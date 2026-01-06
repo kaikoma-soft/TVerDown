@@ -17,7 +17,7 @@ def readConf( opt = nil )
       cfg2 = File.expand_path( cfg )
       if test( ?f, cfg2 )
         require cfg2
-        log( "readConf #{cfg2}" ) if $opt.v == true
+        log( "readConf #{cfg2}" ) if $opt != nil and $opt.v == true
         break
       end
     end

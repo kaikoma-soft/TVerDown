@@ -4,7 +4,7 @@
 #
 class Opt
   attr_accessor :v, :d, :hl, :n, :dry, :cache, :done, :config, :regex
-  attr_accessor :force
+  attr_accessor :force, :pname
 
   def initialize()
     @v     = false              # 冗長なメッセージ
@@ -17,7 +17,7 @@ class Opt
     @config = nil               # config ファイル
     @regex  = nil               # 対象を絞る正規表現
     @force  = false             # エラーカウントを無視してdownload
-
+    @pname  = ""                #  progname
   end
 
   def parser()

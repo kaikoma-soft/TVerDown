@@ -32,6 +32,14 @@ class Mynoko
         end
       end
       if classN.size == 0
+        File.open( cf, "r" ) do |fp|
+          fp.each_line do |str|
+            if str =~ /配信中のエピソードがありません/
+              puts "Warrnig: 配信中のエピソードがありません #{url}"
+              return ret
+            end
+          end
+        end
         puts "Warrnig: Mynoko::getList() class名 が取得出来ません。#{name} #{cf}"
         return ret
       end

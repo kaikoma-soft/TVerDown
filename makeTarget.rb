@@ -17,6 +17,7 @@ class MakeTarget
   def hashDump( hash )
     retur nil if hash.class != Hash
     hash.each_pair do |k,v|
+      next if k == "trash"      # ゴミ箱以下を無視する。
       if v.class == Hash
         hashDump( v )
       elsif v.class == Array
@@ -107,12 +108,11 @@ EOS
   def initialize( )
 
     @list = {}
-    @json = File.join( ENV["HOME"], ".config/google-chrome/Default/Bookmarks" )
-    #@json = File.join( ENV["HOME"], ".config/vivaldi/Default/Bookmarks" )
     @merge = false
     @config = nil               # config ファイル
     @optStr = '"' + OptStr + '"'
-    
+    @json = nil
+
     OptionParser.new do |opt|
       @pname = opt.program_name
       opt.version = ProgVer
@@ -124,12 +124,20 @@ EOS
       opt.parse!(ARGV)
     end
 
+    readConf( @config )
+    
     if  @merge == true
-      $opt = Opt.new
-      readConf( @config )
       raise "target not found" if Object.const_defined?(:TARGET) != true
     end
-    
+
+    if @json == nil 
+      if Object.const_defined?(:MT_JSON) == true
+        @json = MT_JSON
+      else
+        @json = File.join( HOME, ".config/google-chrome/Default/Bookmarks" )
+      end
+    end
+      
     if test( ?f, @json )
       File.open(@json) do |file|
         hash = JSON.load(file)

@@ -145,8 +145,16 @@ mpv等で再生するという手作業を行っていた。
 
    chrome系のブラウザの bookmark ファイルを読んで,
    URL が "http://tver.jp/series" なものを抽出し、tagrget.rb の雛形を
-   出力する。
+   出力する。<br>
+   -M で、追加分のみを出力することも出来る。
+   
 
+    * config.rb 中の以下のパラメータで制御される。
+    
+      | パラメータ    |  意味                                          |
+      |---------------|------------------------------------------------|
+      | MT_JSON       | 読み込む ブラウザの bookmark ファイルのパス    |
+      
    ```
    使用法: makeTarget [オプション]... 
 
@@ -178,6 +186,36 @@ mpv等で再生するという手作業を行っていた。
     * 変換が終了したファイルの先頭に @@_ を付加する。
     * @@_ が付いたファイルは、X264expire 日後に削除される。
 
+* watchNewProg.rb
+
+    TVer のカテゴリページを監視して、番組のリンクの増減を検出するプログラム<BR>
+    WNP_RSS_ON を true に設定することにより RSS2.0 形式のファイルを出力することも出来る。
+
+    * config.rb 中の以下のパラメータで制御される。
+    
+      | パラメータ    |  意味                                          |
+      |---------------|------------------------------------------------|
+      | WNP_cateTop   | TVer のカテゴリページの URL                    |
+      | WNP_RSS_ON    | true の場合に RSS を出力する。                 |
+      | WNP_RSS_NUM   | RSS に出力する過去の履歴の個数                 |
+      | WNP_RSS_FNAME | RSS を出力するファイル名                       |
+      | WNP_RSS_LINK  | RSS ファイルに埋め込む link アドレス           |
+
+    * 出力例
+   ```
+   +++++ ドラマ +++++
+   del /series/sre0w24jg7 コンフィデンスマンJP
+   del /series/srlldog583 くるバラ
+
+   +++++ バラエティ +++++
+   add /series/srv4o039it ブラマヨ小杉の沖縄ゲンセキMAP
+   del /series/srovvinp4d 教えて！ニュースライブ 正義のミカタ
+
+   +++++ アニメ +++++
+   add /series/sr6hk529m5 多聞くん今どっち！？
+   del /series/sry07vgtuy HUNTER×HUNTER
+   del /series/sr52ujhk7y 阿波連さんははかれない season2
+   ```
 
 ## 実行オプション
 
@@ -215,6 +253,16 @@ mpv等で再生するという手作業を行っていた。
   | -O, --opt=type     |  オプションの文字列(nil,Date,Serial) を指定。デフォルトは Date |
   |     --help         |  help メッセージ                            |
 
+* watchNewProg.rb
+  |   オプション       |      説明                                   |
+  |--------------------|---------------------------------------------|
+  | -C, --configDir=dir|  config.rb,target.rb のあるDir を指定する。 |
+  | -H, --no-headless  |   chrome をヘッドレスで起動しない。         |
+  | -h, --headless     |   chrome をヘッドレスで起動する。           |
+  | -N, --no-cache     |   キャッシュを使用しない。                  |
+  |     --version      |   Version 表示                              |
+  |     --help         |   help メッセージ                           |
+
 
 ## 注意点
 
@@ -228,8 +276,6 @@ mpv等で再生するという手作業を行っていた。
 
 * ダウンロードするファイルの一時保存の為に /tmp を使用するので、
   空き容量を確保する必要があります。
-
-
 
 ## ライセンス
 このソフトウェアは、MIT ライセンスのも

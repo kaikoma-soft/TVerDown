@@ -1,4 +1,15 @@
 
+ver 1.2.0         2026/01/05
+  * TVer のカテゴリのページを監視して、番組のリンクの増減を検出するプロ
+    グラム watchNewProg.rb を新規に作成
+    詳細は Readme.md を参照
+
+  * makeTarget.rb
+    * 読み込む json ファイルのパスを config 中の MT_JSON で指定出来る
+      ように変更
+    * vivaldi はブックマークから削除しても、ゴミ箱に移動するだけなので、
+      ゴミ箱を検索対象から外す。
+
 ver 1.1.0         2025/10/13
   * makeTarget.rb -M の時に、除外するものを記述出来るように
      target.rb に DELLIST を追加
