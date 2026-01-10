@@ -129,7 +129,7 @@ EOS
       db2.selectPL( cate: cate ).each do |tmp|
         ( url, title, cate, ctime ) = tmp
         tmp2 = @progD.new( url, title, ctime, false )
-        pdH[ url ] = tmp2
+        pdH[ url ] = tmp2       # URLの重複は後の方が有効
       end
     end
 
@@ -140,9 +140,13 @@ EOS
       doc.xpath("//a").each do |tmp|
         if tmp[:href] =~ /series/
           url  = tmp[:href]
-          name = tmp.at("img")[:alt]
-          if name != "バナー"
-            pl2[ url ] = name
+          if tmp.at("img") != nil
+            name = tmp.at("img")[:alt]
+            if name != "バナー"
+              pl2[ url ] = name
+            end
+          else
+            pp tmp if $opt.d == true
           end
         end
         count += 1
@@ -161,7 +165,7 @@ EOS
 
       # 追加の検出
       pl2.each_pair do |url,name|
-        if pdH[ url ] == nil
+        if pdH[ url ] == nil or pdH[ url ].title != name
           unless url =~ /^http/
             url2 = File.join( TVERJP, url )
           else
@@ -170,6 +174,7 @@ EOS
           buf1 << sprintf("add %-24s %s\n",url, name )
           buf2 << sprintf("add <a href=%s>%-24s</a> %s\n",url2,url, name )
           db2.insertPL( url, name, cate, now )
+          pdH[ url ].flag = true if pdH[ url ] != nil
         else
           pdH[ url ].flag = true
         end
@@ -306,6 +311,7 @@ EOS
       sql += " where cate = ? "
       arg << cate
     end
+    sql += " order by id "
 
     tmp = @db.execute( sql, arg )
     return tmp

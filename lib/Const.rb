@@ -11,7 +11,7 @@ IDLETIME  = 30                  # アイドルタイム
 MAX_FNLEN = 230                 # ファイル名の最大長
 OptStr    = "Date"              # makeTarget.rb のオプションの文字列
 
-ProgVer   = "Ver1.2.0"
+ProgVer   = "Ver1.2.1"
 
 #
 #  構造体定義
