@@ -5,7 +5,7 @@
 #
 def readConf( opt = nil )
 
-  files = %W( config.rb target.rb )
+  files = %W( config.rb ) # target.rb 
   dirs = [ ]
   dirs << opt if opt != nil
   dirs << ENV["TVERDOWN_CONF_DIR"] if ENV["TVERDOWN_CONF_DIR"] != nil

@@ -10,6 +10,7 @@ BaseDir  = File.join( HOME,"/TVerDown" )
 DbDir    = File.join( BaseDir,"/db" )
 CacheDir = File.join( BaseDir,"/Cache" )
 SpoolDir = File.join( BaseDir,"/spool" )
+PidFile  = File.join( BaseDir,"/httpd.pid" )
 
 #
 #  download 履歴のDB
@@ -32,12 +33,35 @@ HEADLESS = false
 #
 LogFn   = File.join( "/tmp", "TVerDown.log" )
 
+#
+#   Ver 2.0.0 以降
+#
+ProgExpire = 35                  # 古い番組データを保持する日数(day)
+LogExpire  = 365                 # 古いdownload記録を保持する日数(day)
+FnOpt    = 1                    # ファイル名に付加するオプションの初期値
+                                # 0=なし、1=日付、2=シリアル番号
+NewMark  = 3                    # new印を付ける日数
+HttpPort = 42101                # http のポート番号
+
 
 #
-#  for makeTarget.rb
+#  for watchNewProg2.rb
 #
-MT_JSON = File.join( HOME, ".config/google-chrome/Default/Bookmarks" )
-#MT_JSON = File.join( HOME, ".config/vivaldi/Default/Bookmarks" )
+WNP_cateTop = {
+  "https://tver.jp/categories/drama"   => "ドラマ",
+  "https://tver.jp/categories/variety" => "バラエティ",
+  "https://tver.jp/categories/anime"   => "アニメ",
+  "https://tver.jp/categories/news"    => "ニュース",
+  "https://tver.jp/categories/sports"  => "スポーツ",
+}
+WNP_RSS_ON = false              # RSS を生成するか ( true = する )
+WNP_RSS_NUM = 10                # RSS に残す過去分
+WNP_RSS_FNAME = File.join( HOME, "public_html/TVer_watchNewProg.rss" ) # RSS の出力ファイル名
+rssFname = "TVer_watchNewProg.rss"
+WNP_RSS_FNAME = File.join( HOME, "public_html/#{rssFname}" ) # RSS の出力ファイル名
+WNP_RSS_LINK = "http://localhost/~#{ENV["USER"]}/#{rssFname}" # RSS link addr
+
+
 
 #
 #  for x256 conv
@@ -50,20 +74,3 @@ ConvSufFix = "-TVer"
 X264expire = 14                 # 変換済みの mp4ファイルの保存期間(日)
 
   
-#
-#  for watchNewProg.rb
-#
-WNP_cateTop = {
-  "https://tver.jp/categories/drama"   => "ドラマ",
-  "https://tver.jp/categories/variety" => "バラエティ",
-  "https://tver.jp/categories/anime"   => "アニメ",
-  "https://tver.jp/categories/news"    => "ニュース",
-  "https://tver.jp/categories/sports"  => "スポーツ",
-}
-#WNP_RSS_ON = true               # RSS を生成するか ( true = する )
-WNP_RSS_NUM = 10                # RSS に残す過去分
-WNP_RSS_FNAME = File.join( HOME, "public_html/TVer_watchNewProg.rss" ) # RSS の出力ファイル名
-rssFname = "TVer_watchNewProg.rss"
-WNP_RSS_FNAME = File.join( HOME, "public_html/#{rssFname}" ) # RSS の出力ファイル名
-WNP_RSS_LINK = "http://localhost/~#{ENV["USER"]}/#{rssFname}" # RSS link addr
-

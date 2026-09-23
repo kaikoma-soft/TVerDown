@@ -1,0 +1,35 @@
+doctype html
+
+html
+  head
+    title  = @title
+    meta http-equiv='Content-Type' content='text/html' charset='utf-8'
+    meta name= 'viewport' content='width=device-width, initial-scale=1.0'
+
+  body
+    - if Local_jquery == false
+      script src='https://code.jquery.com/jquery-3.3.1.min.js'
+      script src='https://code.jquery.com/ui/1.12.0/jquery-ui.min.js'
+      link rel='stylesheet' href='http://code.jquery.com/ui/1.12.1/themes/pepper-grinder/jquery-ui.css'
+
+      link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+      script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"
+
+    - if Local_jquery == true
+      script src='/jquery-3.3.1.min.js'
+      script src='/jquery-ui.min.js'
+      link rel='stylesheet' href='/jquery-ui.css'
+      link rel='stylesheet' href='/materialize.min.css' media='screen,projection'
+      script src='/materialize.min.js'
+
+    link rel='stylesheet' href='/style.css'
+    link rel='stylesheet' href='/overlaid.css'
+    link rel='stylesheet' href='/nav.css'
+
+    == yield
+    javascript:
+      $(".dropdown-trigger").dropdown();
+      $(document).ready(function(){
+          $('.sidenav').sidenav();
+      });
+

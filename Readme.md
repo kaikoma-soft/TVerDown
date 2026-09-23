@@ -1,26 +1,24 @@
 
 
-
 ## 開発の背景と目的
 
-普段使っている Ubuntu上の vivaldi はサポート外のため、
-ブラウザで TVer の動画を視聴することが出来ない。<br>
-そのため、ブラウザで URL を確認し、yt-dlp でダウンロードし、
-mpv等で再生するという手作業を行っていた。
+本プログラムは、TVer の目的番組をバッチ的にダウンロードするための補助プログラムです。
 
-本プログラムは、それを自動化し TVer の目的番組を
-バッチ的にダウンロードするための補助プログラムです。
+Ver2 では、Download 対象をブラウザから選択できるように
+GUIインターフェースを追加し、それに合わせて機能追加を行った。
 
 ## 動作概要
 
-* あらかじめ目的の番組を target ファイルに記述する。
-* プログラムを実行すると、
+* 定期的に TVer の番組表から番組名を抽出し、DBに登録するプログラム
+  ( watchNewProg2.rb ) を実行する。
+* webサーバープログラム( httpd.rb )を立ち上げる。
+* webブラウザでアクセスし、download したいもののステータスを変更する。
+* downloadプログラム( TVerDown2.rb )を実行すると、
   * chromium で目的の番組ページを取得する。
   * ページ中から動画の URL を抽出
   * URL が既に download済みか、DB から検索
   * 検索して未了ならば、download 開始
   * download が正常終了ならば DB に完了登録
-* cron で定期的に実行するように設定すれば、新規登録された動画を自動で取得できる。
 
 
 ## 動作環境
@@ -29,6 +27,7 @@ mpv等で再生するという手作業を行っていた。
 * sqlite3
 * ruby-nokogiri
 * chromium
+* ferrum
 * python 3
 * yt-dlp
 * ffmpeg
@@ -40,7 +39,7 @@ mpv等で再生するという手作業を行っていた。
 
    |   dir                   | 説明                           |
    |-------------------------|--------------------------------|
-   |  $HOME/TVerDown/prog    | プログラム インストール Dir    |
+   |  $HOME/TVerDown/com     | プログラム インストール Dir    |
    |  $HOME/TVerDown/db      | database 保存Dir               |
    |  $HOME/TVerDown/Cache   | 番組ページのキャッシュ保存 Dir |
    |  $HOME/TVerDown/spool   | 動画保存 Dir                   |
@@ -65,12 +64,12 @@ mpv等で再生するという手作業を行っていた。
 1. TVerDown 本体のインストール
 
    ```
-   $ cd $HOME/TVerDown/prog
+   $ cd $HOME/TVerDown/com
    $ git clone --depth 1 https://github.com/kaikoma-soft/TVerDown.git .
    ```
-1. config.rb, target.rb のコピー
+1. config.rb のコピー
 
-   $HOME/TVerDown/prog/config の下に設定ファイルの雛形が有るので、
+   $HOME/TVerDown/com/config の下に設定ファイルの雛形が有るので、
    $HOME/.config/TVerDown にコピーし、自分の環境に合わせて適宜変更する。
 
    ```
@@ -84,13 +83,23 @@ mpv等で再生するという手作業を行っていた。
     | DbDir         | database の保存ディレクトリ
     | CacheDir      | キャッシュの保存ディレクトリ
     | SpoolDir      | ダウンロードしたファイルの保存ディレクトリ
-    | DbFname       | Database file 名
+    | DbFname       | DataBase file 名
     | YTDLP_cmd     | yt-dlp の実行ファイル
     | YTDLP_opt     | yt-dlp のオプション
     | HEADLESS      | ブラウザを headless で起動するかの初期値
     | LogFn         | ログファイルのパス
-  
-   なお config.rb, target.rb 検索の優先順位は次の通り
+    | ProgExpire    | 古い番組データを保持する日数(day) 0で削除しない。
+    | LogExpire     | 古いdownload記録を保持する日数(day) 0で削除しない。
+    | FnOpt         | ファイル名に付加するオプションの初期値(0=なし、1=日付、2=シリアル番号)
+    | NewMark       | new印を付ける日数
+    | HttpPort      | httpd のポート番号
+    | WNP_cateTop   | 番組名を検索するページのURL
+    | WNP_RSS_ON    | RSS を生成するか ( true = する )
+    | WNP_RSS_NUM   | RSS に出力する過去の履歴の個数 
+    | WNP_RSS_FNAME | RSS を出力するファイル名 
+    | WNP_RSS_LINK  | RSS ファイルに埋め込む link アドレス
+
+   なお config.rb 検索の優先順位は次の通り
 
      1. --configDir, -C オプションで指定したディレクトリ
      1. 環境変数 TVERDOWN_CONF_DIR で指定したディレクトリ
@@ -98,74 +107,26 @@ mpv等で再生するという手作業を行っていた。
 
 ## 使用方法
 
-1. target.rb に、目的の番組の番組情報を記述する。
-   * 記述例
-      ```
-      TARGET = [
-        [ "series/sr85a3356t", "きょうの料理ビギナーズ",  nil ],
-        [ "series/srx2o7o3c8", "WBS",                    "Date"],
-        [ "series/srnk9ijw9v", "全力完走",               "Serial"],
-      ]
-      ```
 
-    * 説明
-
-      書式は ruby の２次元配列で、次のパラメータを記述する。
-      |  要素   |  意味                                       |
-      |---------|---------------------------------------------|
-      | 1番目   | 番組ページの URL (https://tver.jp は省略可) |
-      | 2番目   | 動画を格納する Dir名                        |
-      | 3番目   | オプションの指定(下記参照)                  |
-
-      番組ページとは、https://tver.jp/series/XXXXXXX (XXXXXXX はランダム)
-      
-
-    * オプションの説明
-
-      |  オプション   |  意味                                          |
-      |---------------|------------------------------------------------|
-      | nil           | 何もしない                                     |
-      | Date          | 日付(YYYY-MM-DD)をファイル名の先頭に付加する。 |
-      | Serial        | 連番をファイル名の先頭に付加する。             |
-
-      なお、先頭の文字で判断するので、"D","S" でも可
-  
-    *  雛形を生成する makeTarget.rb (後述) で生成することも出来ます。
-
-
-1. 実行方法
+1. 番組情報の取得を実行する。
 
    ```
-   $ sh $HOME/TVerDown/prog/run_TD.sh
+   $ ruby  $HOME/TVerDown/com/watchNewProg2.rb
+   ```
+
+1. WEBサーバーを立ち上げる。
+   ```
+   $ sh $HOME/TVerDown/com/run_TD.sh --httpd
+   ```
+1. WEBブラウザで、http://localhost:42101 にアクセスし、download 対象を選ぶ。
+   (42101は HttpPort で指定 )
+
+1. 定期的に番組情報の取得とdownload プログラムを実行する。
+   ```
+   $ sh $HOME/TVerDown/com/run_TD.sh
    ```
 
 ## おまけツール
-
-* makeTarget.rb
-
-   chrome系のブラウザの bookmark ファイルを読んで,
-   URL が "http://tver.jp/series" なものを抽出し、tagrget.rb の雛形を
-   出力する。<br>
-   -M で、追加分のみを出力することも出来る。
-   
-
-    * config.rb 中の以下のパラメータで制御される。
-    
-      | パラメータ    |  意味                                          |
-      |---------------|------------------------------------------------|
-      | MT_JSON       | 読み込む ブラウザの bookmark ファイルのパス    |
-      
-   ```
-   使用法: makeTarget [オプション]... 
-
-    -J, --json=file      読み込む json ファイルを指定する。指定しない場合は、
-                        ~/.config/google-chrome/Default/Bookmarks
-    -M, --merge          target.rb の内容と比較して、追加分だけを出力する。
-    -C, --configDir=dir  target.rb のあるDir を指定する。(-M 指定時のみ有効)
-    -O, --opt=type       オプションの文字列(nil,Date,Serial) を指定。デフォルトは Date 
-        --help           help メッセージ
-   ```
-   なお target.rb の検索順序は TVerDown と同じ。
 
 * x265conv.rb
 
@@ -186,40 +147,10 @@ mpv等で再生するという手作業を行っていた。
     * 変換が終了したファイルの先頭に @@_ を付加する。
     * @@_ が付いたファイルは、X264expire 日後に削除される。
 
-* watchNewProg.rb
-
-    TVer のカテゴリページを監視して、番組のリンクの増減を検出するプログラム<BR>
-    WNP_RSS_ON を true に設定することにより RSS2.0 形式のファイルを出力することも出来る。
-
-    * config.rb 中の以下のパラメータで制御される。
-    
-      | パラメータ    |  意味                                          |
-      |---------------|------------------------------------------------|
-      | WNP_cateTop   | TVer のカテゴリページの URL                    |
-      | WNP_RSS_ON    | true の場合に RSS を出力する。                 |
-      | WNP_RSS_NUM   | RSS に出力する過去の履歴の個数                 |
-      | WNP_RSS_FNAME | RSS を出力するファイル名                       |
-      | WNP_RSS_LINK  | RSS ファイルに埋め込む link アドレス           |
-
-    * 出力例
-   ```
-   +++++ ドラマ +++++
-   del /series/sre0w24jg7 コンフィデンスマンJP
-   del /series/srlldog583 くるバラ
-
-   +++++ バラエティ +++++
-   add /series/srv4o039it ブラマヨ小杉の沖縄ゲンセキMAP
-   del /series/srovvinp4d 教えて！ニュースライブ 正義のミカタ
-
-   +++++ アニメ +++++
-   add /series/sr6hk529m5 多聞くん今どっち！？
-   del /series/sry07vgtuy HUNTER×HUNTER
-   del /series/sr52ujhk7y 阿波連さんははかれない season2
-   ```
 
 ## 実行オプション
 
-* TVerDown.rb
+* TVerDown2.rb
   |   オプション       |      説明                                   |
   |--------------------|---------------------------------------------|
   | -C, --configDir=dir|  config.rb,target.rb のあるDir を指定する。 |
@@ -236,24 +167,7 @@ mpv等で再生するという手作業を行っていた。
   |     --help         |  help メッセージ                            |
   | -n, --maxnum=n     |  download 個数制限                          |
 
-* x265conv.rb
-  |   オプション       |      説明                                   |
-  |--------------------|---------------------------------------------|
-  | -C, --configDir=dir|  config.rb,target.rb のあるDir を指定する。 |
-  |  -M, --maxproc=n   |    変換数の制限                             |
-  |  -F, --force       |    ロックを無視して実行する。               |
-  |     --help         |  help メッセージ                            |
-
-* makeTarget.rb
-  |   オプション       |      説明                                   |
-  |--------------------|---------------------------------------------|
-  | -J, --json=file    |  読み込む json ファイルを指定する。         |
-  | -M, --merge        |  target.rb の内容と比較して、追加分だけを出力する。|
-  | -C, --configDir=dir|  target.rb のあるDir を指定する。(-M 指定時のみ有効)|
-  | -O, --opt=type     |  オプションの文字列(nil,Date,Serial) を指定。デフォルトは Date |
-  |     --help         |  help メッセージ                            |
-
-* watchNewProg.rb
+* watchNewProg2.rb
   |   オプション       |      説明                                   |
   |--------------------|---------------------------------------------|
   | -C, --configDir=dir|  config.rb,target.rb のあるDir を指定する。 |
@@ -262,6 +176,22 @@ mpv等で再生するという手作業を行っていた。
   | -N, --no-cache     |   キャッシュを使用しない。                  |
   |     --version      |   Version 表示                              |
   |     --help         |   help メッセージ                           |
+
+* x265conv.rb
+  |   オプション       |      説明                                   |
+  |--------------------|---------------------------------------------|
+  | -C, --configDir=dir|  config.rb,target.rb のあるDir を指定する。 |
+  | -M, --maxproc=n    |    変換数の制限                             |
+  | -F, --force        |    ロックを無視して実行する。               |
+  |     --help         |  help メッセージ                            |
+
+
+* http.rb
+  |   オプション       |      説明                                   |
+  |--------------------|---------------------------------------------|
+  | -C, --configDir=dir|  config.rb,target.rb のあるDir を指定する。 |
+  |     --kill         |  httpd のプロセスを kill する。             |
+  |     --help         |  help メッセージ                            |
 
 
 ## 注意点

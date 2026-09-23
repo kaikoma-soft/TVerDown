@@ -1,0 +1,61 @@
+/
+/  編集ダイアログ
+/
+
+
+/- require_relative 'editD.rb'
+/- dp = EditD.new(  )
+/- data = dp.getData( @id )
+
+css:
+  .form-grid {
+    display: grid; /* 1列目を100px固定、2列目を残り幅全域(1fr)にする */
+    grid-template-columns: 120px 1fr; 
+    gap: 1em;                  /* 行と列のすき間 */
+    align-items: center;        /* 上下中央揃え */
+  }
+  .form-grid label {
+    font-weight: bold;
+  }
+  .form-grid input {
+    padding: 0.5rem;
+    font-size: 0.5em;
+  }
+
+form.form-grid
+  label for="title" タイトル
+  input type="text" id="title2" name="title" value="#{@data.title}"
+
+  label for="url"   URL
+  input type="text" id="url" name="url" value="#{@data.url}"
+
+  label 状態
+  span
+    label
+      input name="statRadio" type="radio" value="0" checked=statRadioChk?(0)
+         span 未
+    label
+      input name="statRadio" type="radio" value="1" checked=statRadioChk?(1)
+         span Down
+    label
+      input name="statRadio" type="radio" value="2" checked=statRadioChk?(2)
+         span 完了
+    label
+      input name="statRadio" type="radio" value="3" checked=statRadioChk?(3)
+         span 無視
+
+  label ファイル名オプション
+  span
+    label
+      input name="optRadio" type="radio" value="0" checked=optRadioChk?(0)
+         span なし
+    label
+      input name="optRadio" type="radio" value="1" checked=optRadioChk?(1)
+         span 日付
+    label
+      input name="optRadio" type="radio" value="2" checked=optRadioChk?(2)
+         span シリアル番号
+
+
+  input type="hidden" id="id" name="id" value="#{@data.id}"
+

@@ -98,8 +98,12 @@ EOS
       next if delList[ tmp ] == true
       if urls[ tmp ] == nil
         tmp = "\"" + tmp + "\""
-        tmp2 = "\"" + @list[key].dup.gsub(/\//,'／') + "\""
-        printf("  [ %-22s, %s, %s ],\n", tmp, tmp2, @optStr )
+        tmp2 = @list[key].dup
+        if tmp2 =~ /\|/
+          tmp2 = tmp2.split(/\|/).first.strip
+        end
+        tmp3 = "\"" + tmp2.gsub(/\//,'／') + "\""
+        printf("  [ %-22s, %s, %s ],\n", tmp, tmp3, @optStr )
       end
     end
 

@@ -8,10 +8,10 @@ TVERJP  = "https://tver.jp"
 FailCount = 3                   # download 失敗の制限値
 EOD       = 9999                # End of Download
 IDLETIME  = 30                  # アイドルタイム
-MAX_FNLEN = 230                 # ファイル名の最大長
+MAX_FNLEN = 220                 # ファイル名の最大長
 OptStr    = "Date"              # makeTarget.rb のオプションの文字列
 
-ProgVer   = "Ver1.3.0"
+ProgVer   = "Ver2.0.0"
 
 #
 #  構造体定義
@@ -25,5 +25,5 @@ Pdata    = Struct.new( :url,    # 番組ページURL
                        :ignore, # 無視するか
                        :progdl  # 番組ページを DL するか
                      ) 
-PdataSub = Struct.new( :url, :title, :downFlag, :failcount ) # 番組個別
+PdataSub = Struct.new( :url, :dir, :title, :downFlag, :failcount ) # 番組個別
 

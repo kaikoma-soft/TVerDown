@@ -75,7 +75,7 @@ class Main
 
     @mf.setup()
 
-    text = []
+    text = []                   # RSS text
     WNP_cateTop.each_pair do |url, cateName|
       tmp = getSeries( url, cateName )
       text << "" if tmp.size > 0 and text.size > 0
@@ -85,7 +85,7 @@ class Main
     if text.size > 0
       @db.open( ) do |db2|
         sql = "insert into rssText ( text,ctime ) values (?,?)"
-        db2.execute( sql, text.join("<br>\n"), Time.now.to_i )
+        db2.execute( sql, [ text.join("<br>\n"), Time.now.to_i ])
 
         # expire
         sql = <<EOS
@@ -323,7 +323,7 @@ EOS
   #
   def insertPL( url, title, cate, ctime )
     sql = "insert into progList ( url,title,cate,ctime ) values ( ?,?,?,? ) "
-    @db.execute( sql, url, title, cate, ctime )
+    @db.execute( sql, [ url, title, cate, ctime ] )
   end
   
   #
@@ -331,7 +331,7 @@ EOS
   #
   def deletePL( url )
     sql = "delete from progList where url= ? "
-    @db.execute( sql, url )
+    @db.execute( sql, [ url ] )
   end
   
   

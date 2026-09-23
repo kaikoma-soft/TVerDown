@@ -13,8 +13,9 @@ class MyFerrum
 
     @cookiesFn = File.join( DbDir, "ferrumCookies.yaml" )
     @browser   = nil
-    @headless = headless
-
+    @headless  = headless
+    @page      = nil
+    @source    = nil
   end
 
   def setup()
@@ -98,8 +99,25 @@ class MyFerrum
     log("get #{url}") if $opt.v == true
     rcount = 0
     begin
-      @browser.go_to( url )
+      @page = @browser.create_page
+      @page.go_to( url )
       sleep(1)
+
+      # "もっとみる" があれば click する
+      @page.css('[type="button"]').each do |tmp|
+        tmp2 = tmp.at_xpath('.//div[contains(text(), "もっとみる")]')
+        if tmp2 != nil
+          sleep(3)
+          tmp.scroll_into_view
+          sleep(3)
+          log("push もっとみる")
+          tmp.click( )
+          sleep(3)
+        end
+      end
+      
+      @source = @page.body
+      
     rescue Ferrum::StatusError, Ferrum::PendingConnectionsError => e
       rcount += 1
       if rcount < 5
@@ -129,8 +147,13 @@ class MyFerrum
   #  html の save
   #
   def saveHtml( fname )
-    File.open( fname,"w") do |fp|
-      fp.puts @browser.body
+    puts("saveHtml( #{fname} )") if $opt.v == true
+    if @source != nil
+      File.open( fname,"w") do |fp|
+        fp.puts @source
+      end
+    else
+      puts("Error: source is nil")
     end
     return fname
   end

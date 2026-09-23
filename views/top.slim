@@ -1,0 +1,229 @@
+/
+/  予約一覧
+/
+
+css:
+  td,th {
+    padding: 2px ;
+  }
+  .inline-block {
+    display: inline-block;      /* インラインブロック要素にする */
+    padding: 0px;
+    margin:  0px 2px 0px 2px;
+  }
+  .pagination {
+    margin-left:  2em;
+  }
+  table {
+    margin: 1.0em 1.0em 1.0em 1.0em ;
+  }
+  h4 {
+    margin: 1.0em 1.0em 1.0em 1.0em ;
+  }
+  #band {
+    margin-top:  1em;
+  }
+  .sel {
+    margin: 0em 0em 0em 0em ;
+  }
+  img {
+    margin: 0em 0em 0.2em 0.5em ;
+  }
+  .tabs .tab  a {
+    font-size: 1.5em;
+    padding: 3px 9px 2px 9px;
+    color: #000000;
+  }
+  .tabs {
+    background-color: #dddddd;
+  }
+  .tabs .tab a:hover, .tabs .tab a.active {
+    background-color: transparent;
+    color: #000000;
+  }
+  label {
+    font-size: 1.0em;
+    color: #000000;
+    margin: 0.5em 1.0em 0.5em 1.0em ;
+  }
+  .btn {
+    padding: 0px 5px 5px 5px;
+    height: 2.1em;
+  }
+  table {
+    width: 98%;
+  }
+  .radio {
+    margin: 1.0em 1.0em 1.0em 2.0em ;
+  }
+
+  .btn--orange, a.btn--orange {
+    color: #fff;
+    background-color: #26a69a;
+    padding: 4px 4px 4px 4px;
+  }
+  .btn--orange:hover, a.btn--orange:hover {
+    color: #fff;
+    background: #2bbbad;
+  }
+  a.btn--radius {
+    border-radius: 6px;
+  }
+
+- require_relative 'top.rb'
+- dp = Top.new( @cateS, session[:disp] )
+- dp.setup( )
+
+javascript:
+  // Or with jQuery
+
+  $(document).ready(function(){
+     $('.tabs').tabs();
+  });
+
+  $(document).ready(function(){
+     $('select').formSelect();
+  });
+
+p
+h4 TVerdown <span style="font-size: 0.5em;"> ( httpd #{ProgVer}) </span>
+
+/ <a class="waves-effect waves-light btn pagination " href="stop">restart</a>
+
+form action="#" class="radio"
+    span class="radio" 表示条件
+    label
+      input name="dispRadio" type="radio" value="1" checked=dp.dispChk?(1)
+        span 全部
+    label
+      input name="dispRadio" type="radio" value="2" checked=dp.dispChk?(2)
+        span Down のみ
+    label
+      input name="dispRadio" type="radio" value="3" checked=dp.dispChk?(3)
+        span 完了のみ
+    label
+      input name="dispRadio" type="radio" value="4" checked=dp.dispChk?(4)
+        span 未了のみ
+    label
+      input name="dispRadio" type="radio" value="6" checked=dp.dispChk?(6)
+        span 無視のみ
+    label
+      input name="dispRadio" type="radio" value="5" checked=dp.dispChk?(5)
+        span 無視以外
+
+
+div.row
+    div#band.col.s12
+      ul.tabs
+        - dp.cate.keys.sort.each do |cate|
+          li.tab.col.s3
+            a href="#cate#{dp.cate[cate].to_s}" cate="#{cate}" class="#{dp.active?( cate )} category"
+              | #{cate}
+
+    div
+      - dp.cate.keys.sort.each do |cate|
+        == dp.tbldata[cate]
+
+div id="sample-dialog" title="詳細" style="display:none;"
+  p 
+
+javascript:
+  // download checkbox
+  document.querySelectorAll('.cb').forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+      let isChecked = this.checked;
+      let itemId = $(this).attr("id");
+        //console.log('Id = ',itemId);
+
+        $.ajax({
+          url: '/cb',
+          type: 'POST',
+          data: { 
+              flag: isChecked,
+              id:   itemId
+          },
+          success: function(response) {
+          },
+          error: function() {
+              $('#resultMessage').text('通信エラーが発生しました');
+          }
+      });
+    });
+  });
+
+
+  $(".dialog").click(function(event){
+    var did = $(this).attr('did');
+    console.log('Id = ',did);
+    $("#sample-dialog").load('/editD/' + did );
+    $("#sample-dialog").dialog({
+      modal: true,
+      maxWidth: 1200,
+      width:    1000,
+      buttons: { //ボタン
+        "修正登録": function() {
+          $.ajax({
+            url: '/editM',
+            type:"POST",
+            data:  $('form').serialize() + '&param=1',
+            async: true,
+            timeout: 30000
+          }).done( function(results) {
+            location.reload();
+          })
+        },
+        "削除": function() {
+          $.ajax({
+            url:  '/del',
+            type: "POST",
+            data:  $('form').serialize() + '&param=1',
+            async: true,
+            timeout: 30000
+          }).done( function(results) {
+            location.reload();
+          })
+        },
+        "閉じる": function() {
+          $(this).dialog("close");
+        }
+      },
+    });
+    return false;
+  });
+
+  $(".category").click(function(event){
+    var cate = $(this).attr('cate');
+    //console.log('Id = ', cate);
+    $.ajax({
+      url: '/cate',
+      type: "POST",
+      data:  cate,
+      async: true,
+      timeout: 30000
+    }).done( function(results) {
+    })
+  });
+
+  // 表示条件のイベントリスナーの登録
+  const radioButtons = document.querySelectorAll('input[name="dispRadio"]');
+  radioButtons.forEach(radio => {
+    radio.addEventListener('change', async (event) => {
+      // 選択されたラジオボタンの値を取得
+      const selectedValue = event.target.value;
+      console.log('Id = ', selectedValue);
+      $.ajax({
+       url: '/dispSel',
+        type: "POST",
+        data:  selectedValue,
+        async: true,
+        timeout: 30000
+      }).done( function(results) {
+        setTimeout(function() {
+            location.reload(); }, 100); 
+      })
+     })
+  });
+
+
+
+== include( "/move_top.html" )

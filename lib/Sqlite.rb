@@ -100,8 +100,9 @@ EOS
     end
   end
 
-  def execute( *args )
-    @db.execute( *args )
+  def execute( *args ) # 
+    sql = args.shift
+    @db.execute( sql, args )
   end
 
   def prepare( str )
@@ -188,7 +189,7 @@ EOS
   #
   def downEnd( url )
     sql = "update downlog set failcount = ? where url = ? "
-    @db.execute( sql, EOD, url )
+    @db.execute( sql, [ EOD, url ] )
   end
   
 end

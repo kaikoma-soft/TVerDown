@@ -271,7 +271,7 @@ class Main
       Dir.open( tmpdir ).each do |file|
         if file =~ /\.mp4$/
           path = File.join( tmpdir, file )
-          if File.size( path ) > 10 * 1024 * 1024
+          if File.size( path ) > 5 * 1024 * 1024
             FileUtils.mv( path, outDir )
             ret = true
           end
