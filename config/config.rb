@@ -56,7 +56,6 @@ WNP_cateTop = {
 }
 WNP_RSS_ON = false              # RSS を生成するか ( true = する )
 WNP_RSS_NUM = 10                # RSS に残す過去分
-WNP_RSS_FNAME = File.join( HOME, "public_html/TVer_watchNewProg.rss" ) # RSS の出力ファイル名
 rssFname = "TVer_watchNewProg.rss"
 WNP_RSS_FNAME = File.join( HOME, "public_html/#{rssFname}" ) # RSS の出力ファイル名
 WNP_RSS_LINK = "http://localhost/~#{ENV["USER"]}/#{rssFname}" # RSS link addr

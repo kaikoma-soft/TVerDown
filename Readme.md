@@ -47,26 +47,29 @@ GUIインターフェースを追加し、それに合わせて機能追加を�
 1. 必要なツールをパッケージからインストールする。(ubuntu の場合)
 
    ```
-   $ sudo apt install -y ruby ruby-dev ruby-sqlite3 ruby-nokogiri chromium-browser sqlite3 wget python3 git make gcc ffmpeg
+   $ sudo apt install -y ruby ruby-dev ruby-sqlite3 ruby-nokogiri chromium-browser sqlite3 wget python3 git make gcc ffmpeg puma
    $ sudo gem install ferrum
+   ```
+1. TVerDown 本体のインストール
+
+   ```
+   $ mkdir -p $HOME/TVerDown/com
+   $ mkdir -p $HOME/TVerDown/db
+   $ mkdir -p $HOME/TVerDown/Cache
+   $ mkdir -p $HOME/TVerDown/spool
+   $ cd $HOME/TVerDown/com
+   $ git clone --depth 1 https://github.com/kaikoma-soft/TVerDown.git .
    ```
 1. yt-dlp のインストール
 
    yt-dlp は頻繁にアップデートされるのでパッケージではなく、
    配布元から直接インストールする。
    ```
-   $ mkdir -p $HOME/TVerDown/com
    $ cd $HOME/TVerDown/com
    $ wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp
    $ chmod +x yt-dlp
    ```
 
-1. TVerDown 本体のインストール
-
-   ```
-   $ cd $HOME/TVerDown/com
-   $ git clone --depth 1 https://github.com/kaikoma-soft/TVerDown.git .
-   ```
 1. config.rb のコピー
 
    $HOME/TVerDown/com/config の下に設定ファイルの雛形が有るので、
@@ -75,7 +78,7 @@ GUIインターフェースを追加し、それに合わせて機能追加を�
    ```
    $ mkdir -p $HOME/.config/TVerDown
    $ cp config/* $HOME/.config/TVerDown
-   $ vi config.rb
+   $ vi $HOME/.config/TVerDown/config.rb
    ```
 
     | パラメータ    |  意味                                          |
