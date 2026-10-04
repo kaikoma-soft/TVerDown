@@ -22,6 +22,8 @@ DbFname = File.join( DbDir, "db.sqlite" )
 #
 YTDLP_cmd = File.join( BaseDir,"com/yt-dlp" )
 YTDLP_opt = %W( -r 1M --progress --color no_color )
+MAX_FNLEN = 220                 # ファイル名の最大長
+MIN_FSIZE = ( 5 * 1024 * 1024 ) # download 成功/失敗の閾値(byte)
 
 #
 #  ブラウザを headless で起動するかの初期値 true/false (true=する)

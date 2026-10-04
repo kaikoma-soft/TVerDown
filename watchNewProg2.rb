@@ -131,7 +131,7 @@ class Main
       end
     end
     printf("count = %d\n", count) if $opt.v == true
-    if count < 80
+    if count < 40
       printf("Error: a タグの数が不足 %s %d\n",urlC, count)
       return []
     end
@@ -412,6 +412,7 @@ EOS
   #
   def expire( pday = ProgExpire, lday = LogExpire )
 
+    buf = []
     #
     #  progList2 の削除
     #
@@ -421,7 +422,7 @@ EOS
       sql = "select cate,title,ctime from progList2 where flag != 1 and atime < ?  order by cate,title"
       @db.execute( sql, [ th ] ).each do |tmp|
         ( cate, title, ctime ) = tmp
-        printf("Expire %s %s\n",cate, title)
+        buf << sprintf("Expire %s %s\n",cate, title)
       end
       sql = "delete from progList2 where flag != 1 and atime < ?"
       @db.execute( sql, [ th ] )
@@ -436,7 +437,7 @@ EOS
       @db.execute( sql, [ th ] ).each do |tmp|
         ( title,ctime ) = tmp
         t = Time.at( ctime ).strftime("%F")
-        printf("Expire downlog %s %s\n",t, title)
+        buf << sprintf("Expire downlog %s %s\n",t, title)
       end
       sql = "delete from downlog where ctime < ? "
       @db.execute( sql, [ th ] )
@@ -453,6 +454,13 @@ EOS
     @db.execute( sql )
     
     @db.execute( "vacuum" )
+
+    if buf.size > 0
+      puts("\n+++++  Expire +++++\n",)
+      buf.each do |l|
+        puts( l )
+      end
+    end
   end
   
 end

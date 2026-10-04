@@ -1,4 +1,9 @@
 
+ver 2.0.1         2026/10/01
+  * 番組名が長い場合に、yt-dlp の音声結合処理が失敗する不具合の修正。
+  * 定数 MAX_FNLEN(ファイル名の最大長) をシステム定義から config.rb に移動
+  * 定数 MIN_FSIZE(download 成功/失敗の閾値(byte)) config に追加
+
 ver 2.0.0         2026/09/23
   * WEB インターフェイスを用意し、そこで Download する対象選べるように。
   * 上記の対応のため TVerDown.rb, watchNewProg.rb をアップデート。

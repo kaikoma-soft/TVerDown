@@ -8,10 +8,9 @@ TVERJP  = "https://tver.jp"
 FailCount = 3                   # download 失敗の制限値
 EOD       = 9999                # End of Download
 IDLETIME  = 30                  # アイドルタイム
-MAX_FNLEN = 220                 # ファイル名の最大長
 OptStr    = "Date"              # makeTarget.rb のオプションの文字列
 
-ProgVer   = "Ver2.0.0"
+ProgVer   = "Ver2.0.1"
 
 #
 #  構造体定義

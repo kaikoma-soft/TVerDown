@@ -43,7 +43,14 @@ class Main
       log("Error: yt-dlp not executable (#{YTDLP_cmd})")
       exit
     end
-                
+
+    unless Object.const_defined?( :MAX_FNLEN )
+      Object.const_set( :MAX_FNLEN, 220 )
+    end
+    unless Object.const_defined?( :MIN_FSIZE )
+      Object.const_set( :MIN_FSIZE, 5 * 1024 * 1024 )
+    end
+    
     log("TVerDown start")
     expire()
     run()
@@ -254,17 +261,20 @@ class Main
         fname.strip!
       end
       fname = makeFname( fname, outDir, opt )
+      tmpFname = "out_tmp.mp4"
+      
       cmd = [ YTDLP_cmd ] + YTDLP_opt
-      cmd += [ "-P", tmpdir, "-o", fname, url ]
+      cmd += [ "-P", tmpdir, "-o", tmpFname, url ]
 
       pid = spawn( *cmd ,[:out, :err] => [LogFn, "a"] )
       Process.waitpid( pid )
       
       Dir.open( tmpdir ).each do |file|
-        if file =~ /\.mp4$/
+        if file == tmpFname
           path = File.join( tmpdir, file )
-          if File.size( path ) > 5 * 1024 * 1024
-            FileUtils.mv( path, outDir )
+          if File.size( path ) > MIN_FSIZE
+            toPath = File.join( outDir, fname )
+            FileUtils.mv( path, toPath )
             ret = true
           end
         end

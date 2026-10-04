@@ -101,6 +101,8 @@ GUIインターフェースを追加し、それに合わせて機能追加を�
     | WNP_RSS_NUM   | RSS に出力する過去の履歴の個数 
     | WNP_RSS_FNAME | RSS を出力するファイル名 
     | WNP_RSS_LINK  | RSS ファイルに埋め込む link アドレス
+    | MAX_FNLEN     | ファイル名の最大長
+    | MIN_FSIZE     | download 成功/失敗の閾値(byte)
 
    なお config.rb 検索の優先順位は次の通り
 
