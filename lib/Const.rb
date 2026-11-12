@@ -10,7 +10,7 @@ EOD       = 9999                # End of Download
 IDLETIME  = 30                  # アイドルタイム
 OptStr    = "Date"              # makeTarget.rb のオプションの文字列
 
-ProgVer   = "Ver2.0.1"
+ProgVer   = "Ver2.0.2"
 
 #
 #  構造体定義

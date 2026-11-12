@@ -24,8 +24,10 @@ class Mynoko
           puts "Error: #{name} #{url} #{tmp.text}"
           return ret
         end
-        
-        doc.css('[class*="SeasonEpisodeList_episodes__"]').each do |tmp|
+
+        #css = '[class*="SeasonEpisodeList_episodes__"]'
+        css = '[class*="SeriesEpisodeListSection_root__"]' # 2026/11/12 変更
+        doc.css( css ).each do |tmp|
           tmp.xpath(".//a").each do |tmp2|
             if tmp2[:href] =~ /episode/
               tmp2.xpath(".//img").each do |tmp3|
