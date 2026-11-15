@@ -94,7 +94,23 @@ class MyFerrum
     @browser.quit
   end
 
-  
+  #
+  #  もっと見るを検出
+  #
+  def motto( doc )
+    doc.css('[type="button"]').each do |tmp|
+      tmp.css("div").each do |tmp3|
+        tmp2 = tmp3.text.strip
+        if tmp2 != nil and tmp2 != ""
+          if tmp2 =~ /^全エピソード/
+            return tmp
+          end
+        end
+      end
+    end
+    return nil
+  end
+    
   def goto( url )
     log("get #{url}") if $opt.v == true
     rcount = 0
@@ -104,16 +120,13 @@ class MyFerrum
       sleep(1)
 
       # "もっとみる" があれば click する
-      @page.css('[type="button"]').each do |tmp|
-        tmp2 = tmp.at_xpath('.//div[contains(text(), "もっとみる")]')
-        if tmp2 != nil
-          sleep(3)
-          tmp.scroll_into_view
-          sleep(3)
-          log("push もっとみる")
-          tmp.click( )
-          sleep(3)
-        end
+      if ( tmp = motto( @page )) != nil
+        sleep(3)
+        tmp.scroll_into_view
+        sleep(3)
+        log("push 全エピソード")
+        tmp.click( )
+        sleep(3)
       end
       
       @source = @page.body
@@ -163,5 +176,16 @@ end
 
 
 if $0 == __FILE__
+
+  #
+  #   全
+  #
+  fn = File.join( ENV["HOME"], "data/TVerDown/Cache/67be56d8b1c73f1536e89dac3d6a9d00.html")
+  html = open(fn).read
+  doc = Nokogiri::HTML.parse(html)
+
+  DbDir = "."
+  mf = MyFerrum.new
+  pp  mf.motto( doc )
 
 end
